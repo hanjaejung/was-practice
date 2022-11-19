@@ -1,7 +1,13 @@
 # was-practice
 소켓통신(톰캣을 직접 생성)을 이용해 메인Thread가 사용자 요청을 처리
 
-﻿
+
+
+
+
+
+
+
 강의내용을 보고 정리한 내용입니다.
 
 소켓통신(톰캣을 직접 생성,was를 직접 생성)으로 서버가 클라이언트의 요청을 받아 queryString 에 있는 값으로 사칙연산을 만들었습니다.
@@ -36,3 +42,78 @@ ServerSocket serverSocket = new ServerSocket(port)
 
 try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("[CustomWebApplicationServer] started {} port.", port);
+            
+
+Socket clientSocket;
+
+클라이언트 객체만 생성 후 대기 하다
+
+
+
+Socket clientSocket;
+            logger.info("[CustomWebApplicationServer] waiting for client.");
+
+clientSocket = serverSocket.accept()) != null
+
+클라이언트 서버 실행시 클라이언트와 서버의  연결이 성공
+
+
+
+while ((clientSocket = serverSocket.accept()) != null) {
+                logger.info("[CustomWebApplicationServer] client connected!");
+
+
+그 후 메인 Thread에서 작업을 진행합니다.
+
+InputStream 객체로 클라이언트의 주소를 받아
+
+
+InputStream in = clientSocket.getInputStream();
+
+문자 입력 스트림에서 텍스트를 읽어
+
+
+BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+HttpRequest에 담아
+
+
+HttpRequest httpRequest = new HttpRequest(br);
+
+
+int에 계산할 숫자와 String에 연산자를 담아 미리 만들어두었던 Calculator클래스에 담아 계산을 해준 후
+
+
+int operand1 = Integer.parseInt(queryStrings.getValue("operand1"));
+                        String operator = queryStrings.getValue("operator");
+                        int operand2 = Integer.parseInt(queryStrings.getValue("operand2"));
+
+                        int result = Calculator.calculate(new PositiveNumber(operand1), operator, new PositiveNumber(operand2));
+                        byte[] body = String.valueOf(result).getBytes();
+
+HttpResponse에 담아 클라이언트의 요청을 전달해주었습니다.
+
+
+
+HttpResponse response = new HttpResponse(dos);
+                        response.response200Header("application/json", body.length);
+                        response.responseBody(body);
+
+이 프로그램의 단점은
+
+클라이언트의 요청이 왔을때
+
+메인 Thread에서 작업을 한다는 것이 단점입니다.
+
+
+메인 Thread가 작업을 하다 blocking이 걸리게 된다면
+
+다음 클라이언트의 요청이 해당 클라이언트의 요청이 끝날때까지 기다려야 한다는
+
+끔찍한 단점이 있습니다.
+
+
+즉 해당요청이 클라이언트의 요청이 올때마다 별도의 메인Thread가 아닌
+
+별도 Thread에서 수행할수 있도록 작업이 필요합니다.
+
