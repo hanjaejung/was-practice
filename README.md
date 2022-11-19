@@ -103,21 +103,4 @@ HttpResponse response = new HttpResponse(dos);
                         response.response200Header("application/json", body.length);
                         response.responseBody(body);
 
-이 프로그램의 단점은
-
-클라이언트의 요청이 왔을때
-
-메인 Thread에서 작업을 한다는 것이 단점입니다.
-
-
-메인 Thread가 작업을 하다 blocking이 걸리게 된다면
-
-다음 클라이언트의 요청이 해당 클라이언트의 요청이 끝날때까지 기다려야 한다는
-
-끔찍한 단점이 있습니다.
-
-
-즉 해당요청이 클라이언트의 요청이 올때마다 별도의 메인Thread가 아닌
-
-별도 Thread에서 수행할수 있도록 작업이 필요합니다.
 
